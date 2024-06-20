@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Регистрационная форма</title>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector("form");
+    const sendButton = document.getElementById("send-button");
+
+    function validateForm() {
+        let isValid = true;
+
+        // Валидация имени и фамилии
+        ["first-name", "last-name"].forEach(id => {
+            const input = document.getElementById(id);
+            const error = document.getElementById(id + "-error");
+            if (!/^[a-zA-Zа-яА-Я\s-]{2,30}$/.test(input.value)) {
+                error.textContent = "Допустимы только буквы, 2-30 символов.";
+                isValid = false;
+            } else {
+                error.textContent = "";
+            }
+        });
+
+        // Валидация email
+        const email = document.getElementById("email");
+        const emailError = document.getElementById("email-error");
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.value)) {
+            emailError.textContent = "Введите валидный email.";
+            isValid = false;
+        } else {
+            emailError.textContent = "";
+        }
+
+        // Валидация пароля
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirm-password");
+        const passwordError = document.getElementById("password-error");
+        if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,}/.test(password.value)) {
+            passwordError.textContent = "Пароль должен быть длиной мин. 8 символов и содержать цифры, заглавные и строчные буквы, спецсимволы.";
+            isValid = false;
+        } else if (password.value !== confirmPassword.value) {
+            passwordError.textContent = "Пароли не совпадают.";
+            isValid = false;
+        } else {
+            passwordError.textContent = "";
+        }
+
+        // Валидация даты рождения
+        const dob = document.getElementById("dob");
+        const dobError = document.getElementById("dob-error");
+        const age = getAge(new Date(dob.value));
+        if (age < 18) {
+            dobError.textContent = "Вам должно быть не менее 18 лет.";
+            isValid = false;
+        } else {
+            dobError.textContent = "";
+        }
+
+        sendButton.disabled = !isValid;
+    }
+
+    form.addEventListener("input", validateForm);
+    form.addEventListener("blur", validateForm, true);
+});
+
+function getAge(dob) {
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+    return age;
+}
+</script>
+</head>
+<body>
+<h1>Форма регистрации</h1>
+<form>
+    <label for="first-name">Имя:</label>
+    <input type="text" id="first-name" required><span id="first-name-error" style="color: red;"></span><br>
+    <label for="last-name">Фамилия:</label>
+    <input type="text" id="last-name" required><span id="last-name-error" style="color: red;"></span><br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" required><span id="email-error" style="color: red;"></span><br>
+    <label for="password">Пароль:</label>
+    <input type="password" id="password" required><span id="password-error" style="color: red;"></span><br>
+    <label for="confirm-password">Подтверждение пароля:</label>
+    <input type="password" id="confirm-password" required><br>
+    <label for="dob">Дата рождения:</label>
+    <input type="date" id="dob" required><span id="dob-error" style="color: red;"></span><br>
+    <button type="submit" id="send-button" disabled>Отправить</button>
+</form>
+</body>
+</html>
